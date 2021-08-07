@@ -75,7 +75,30 @@ namespace PayrollServicesADO
             {
                 sqlconnection.Close();
             }
-
         }
+        public void UpdateSalaryUsingStoredProcedure()
+        {
+            EmployeeModel data = new EmployeeModel();
+            using (this.sqlconnection)
+            {
+                SqlCommand command = new SqlCommand("UpdateBasePay", this.sqlconnection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@id", data.empId);
+                command.Parameters.AddWithValue("@name ", data.name);
+                command.Parameters.AddWithValue("@salary", data.Salary);
+                this.sqlconnection.Open();
+                int res = command.ExecuteNonQuery();
+                if (res == 0)
+                {
+                    Console.WriteLine("Query NOt executed...");
+                }
+                else
+                {
+                    Console.WriteLine("Query executed successfully...");
+                }
+                this.sqlconnection.Close();
+            }
+        }
+
     }
 }
