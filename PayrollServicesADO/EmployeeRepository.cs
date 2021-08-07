@@ -14,7 +14,7 @@ namespace PayrollServicesADO
 
         public void GetEmployeeDetails()
         {
-            EmployeeModel data = new EmployeeModel();
+            EmployeeModel employeeModel = new EmployeeModel();
             string query = @"select * from employee_payroll";
             SqlCommand sqlCommand = new SqlCommand(query, sqlconnection);
             this.sqlconnection.Open();
@@ -23,21 +23,20 @@ namespace PayrollServicesADO
             {
                 while (reader.Read())
                 {
-                    data.empId = reader.GetInt32(0);
-                    data.name = reader.GetString(1);
-                    data.Salary = reader.GetDouble(2);
-                    data.startDate = reader.GetDateTime(3);
-                    data.emailId = reader.GetString(4);
-                    data.Gender = reader.GetString(5);
-                    data.PhoneNumber = reader.GetInt64(6);
-                    data.Department = reader.GetString(7);
-                    data.Address = reader.GetString(8);
-                    data.Deductions = reader.GetDouble(9);
-                    data.TaxablePay = reader.GetDouble(10);
-                    data.IncomeTax = reader.GetDouble(11);
-                    data.NetPay = reader.GetDouble(12);
-                    //data.gender,data.Phone,data.Address,data.Departmenr,data.Basicpay,data.Deductions,data.TaxablePay,data.IncomeTax,data.Netpay);
-                    Console.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}", data.empId, data.name, data.Salary, data.startDate,data.emailId,data.Gender, data.PhoneNumber, data.Department, data.Address,data.Deductions, data.TaxablePay, data.IncomeTax, data.NetPay);
+                    employeeModel.empId = Convert.ToInt32(reader["empId"]);
+                    employeeModel.name = reader["name"].ToString();
+                    employeeModel.Salary = Convert.ToDouble(reader["BasicPay"]);
+                    employeeModel.startDate = reader.GetDateTime(3);
+                    employeeModel.emailId = reader["emailId"].ToString();
+                    employeeModel.Gender = reader["Gender"].ToString();
+                    employeeModel.Department = reader["Department"].ToString();
+                    employeeModel.PhoneNumber = Convert.ToDouble(reader["PhoneNumber"]);
+                    employeeModel.Address = reader["Address"].ToString();
+                    employeeModel.Deductions = Convert.ToDouble(reader["Deductions"]);
+                    employeeModel.TaxablePay = Convert.ToDouble(reader["TaxablePay"]);
+                    employeeModel.IncomeTax = Convert.ToDouble(reader["IncomeTax"]);
+                    employeeModel.NetPay = Convert.ToDouble(reader["NetPay"]);
+                    Console.WriteLine("{0} {1} {2}  {3} {4} {5}  {6}  {7} {8} {9} {10} {11} {12}", employeeModel.empId, employeeModel.name, employeeModel.Salary, employeeModel.startDate, employeeModel.emailId, employeeModel.Gender, employeeModel.Department, employeeModel.PhoneNumber, employeeModel.Address, employeeModel.Deductions, employeeModel.TaxablePay, employeeModel.IncomeTax, employeeModel.NetPay);
                     Console.WriteLine("\n");
                 }
             }
@@ -76,29 +75,75 @@ namespace PayrollServicesADO
                 sqlconnection.Close();
             }
         }
-        public void UpdateSalaryUsingStoredProcedure()
+        public int UpdateSalaryUsingStoredProcedure(EmployeeModel model)
         {
-            EmployeeModel data = new EmployeeModel();
+            int result;
             using (this.sqlconnection)
             {
-                SqlCommand command = new SqlCommand("UpdateBasePay", this.sqlconnection);
+                SqlCommand command = new SqlCommand("dbo.UpdateEmployeeDetails", this.sqlconnection);
                 command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@id", data.empId);
-                command.Parameters.AddWithValue("@name ", data.name);
-                command.Parameters.AddWithValue("@salary", data.Salary);
-                this.sqlconnection.Open();
-                int res = command.ExecuteNonQuery();
-                if (res == 0)
+                command.Parameters.AddWithValue("empId", model.empId);
+                command.Parameters.AddWithValue("empName", model.name);
+                command.Parameters.AddWithValue("BasicPay", model.Salary);
+                sqlconnection.Open();
+                result = command.ExecuteNonQuery();
+                if (result != 0)
                 {
-                    Console.WriteLine("Query NOt executed...");
+                    Console.WriteLine("Updated Successfully using stored procedure");
                 }
                 else
                 {
-                    Console.WriteLine("Query executed successfully...");
+                    Console.WriteLine("Not Updated!!!");
+                    return default;
                 }
-                this.sqlconnection.Close();
+                return result;
             }
         }
+        public int RetrieveDataBasedOnDate(EmployeeModel model)
+        {
+            
+            int count = 0;
+            using (sqlconnection)
+            {
+                
+                string query = @"select * from employee_payroll where startDate between('2021-01-01') and getdate()";
+                
+                SqlCommand command = new SqlCommand(query, this.sqlconnection);
+                
+                sqlconnection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    { 
+                        DisplayEmployeeDetails(reader);
+                        count++;
+                    }
+                }
+                reader.Close();
+            }
+            return count;
+        }
+        public void DisplayEmployeeDetails(SqlDataReader reader)
+        {
+            EmployeeModel model = new EmployeeModel();
+           
+            model.empId = Convert.ToInt32(reader["empId"]);
+            model.name = reader["name"].ToString();
+            model.Salary = Convert.ToDouble(reader["Salary"]);
+            model.startDate = reader.GetDateTime(3);
+            model.emailId = reader["emailId"].ToString();
+            model.Gender = reader["Gender"].ToString();
+            model.Department = reader["Department"].ToString();
+            model.PhoneNumber = Convert.ToDouble(reader["PhoneNumber"]);
+            model.Address = reader["Address"].ToString();
+            model.Deductions = Convert.ToDouble(reader["Deductions"]);
+            model.TaxablePay = Convert.ToDouble(reader["TaxablePay"]);
+            model.IncomeTax = Convert.ToDouble(reader["IncomeTax"]);
+            model.NetPay = Convert.ToDouble(reader["NetPay"]);
+            Console.WriteLine("{0} {1} {2}  {3} {4} {5}  {6}  {7} {8} {9} {10} {11} {12}", model.empId, model.name, model.Salary, model.startDate, model.emailId, model.Gender, model.Department, model.PhoneNumber, model.Address, model.Deductions, model.TaxablePay, model.IncomeTax, model.NetPay);
+            Console.WriteLine("\n");
 
+        }
     }
 }
