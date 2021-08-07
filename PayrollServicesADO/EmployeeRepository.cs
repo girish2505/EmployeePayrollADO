@@ -101,21 +101,21 @@ namespace PayrollServicesADO
         }
         public int RetrieveDataBasedOnDate(EmployeeModel model)
         {
-            
+
             int count = 0;
             using (sqlconnection)
             {
-                
+
                 string query = @"select * from employee_payroll where startDate between('2021-01-01') and getdate()";
-                
+
                 SqlCommand command = new SqlCommand(query, this.sqlconnection);
-                
+
                 sqlconnection.Open();
                 SqlDataReader reader = command.ExecuteReader();
                 if (reader.HasRows)
                 {
                     while (reader.Read())
-                    { 
+                    {
                         DisplayEmployeeDetails(reader);
                         count++;
                     }
@@ -127,7 +127,7 @@ namespace PayrollServicesADO
         public void DisplayEmployeeDetails(SqlDataReader reader)
         {
             EmployeeModel model = new EmployeeModel();
-           
+
             model.empId = Convert.ToInt32(reader["empId"]);
             model.name = reader["name"].ToString();
             model.Salary = Convert.ToDouble(reader["Salary"]);
@@ -143,7 +143,33 @@ namespace PayrollServicesADO
             model.NetPay = Convert.ToDouble(reader["NetPay"]);
             Console.WriteLine("{0} {1} {2}  {3} {4} {5}  {6}  {7} {8} {9} {10} {11} {12}", model.empId, model.name, model.Salary, model.startDate, model.emailId, model.Gender, model.Department, model.PhoneNumber, model.Address, model.Deductions, model.TaxablePay, model.IncomeTax, model.NetPay);
             Console.WriteLine("\n");
-
+        }
+        public string AggregateFunctions(string Gender)
+        {
+            string result = null;
+            string query = @"select sum(Salary) as TotalSalary,min(Salary) as MinSalary,max(Salary) as MaxSalary,Round(avg(Salary),0) as AvgSalary,Gender,Count(*) from employee_payroll where Gender =" + "'" + Gender + "'" + " group by Gender";
+            SqlCommand sqlCommand = new SqlCommand(query, this.sqlconnection);
+            sqlconnection.Open();
+            SqlDataReader reader = sqlCommand.ExecuteReader();
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    Console.WriteLine("Total Salary {0}", reader[0]);
+                    Console.WriteLine("Min Salary {0}", reader[1]);
+                    Console.WriteLine("Max Salary {0}", reader[2]);
+                    Console.WriteLine("Average Salary {0}", reader[3]);
+                    Console.WriteLine("Grouped By Gender {0}", reader[4]);
+                    Console.WriteLine("No of employess {0}", reader[5]);
+                    result += reader[4] + " " + reader[0] + " " + reader[1] + " " + reader[2] + " " + reader[3] + " " + reader[5];
+                }
+            }
+            else
+            {
+                result = "empty";
+            }
+            reader.Close();
+            return result;
         }
     }
 }
