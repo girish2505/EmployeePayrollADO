@@ -6,9 +6,9 @@ namespace PayrollServicesADO
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Employee payroll servies ADO");
-            EmployeeRepository repository = new EmployeeRepository();
-
+            Console.WriteLine("Employee payroll services ADO");
+            EmployeeRepository repo = new EmployeeRepository();
+            repo.GetEmployeeDetails();
         }
     }
 }
