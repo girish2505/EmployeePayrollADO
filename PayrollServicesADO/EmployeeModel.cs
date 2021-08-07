@@ -19,5 +19,9 @@ namespace PayrollServicesADO
         public double TaxablePay { get; set; }
         public double IncomeTax { get; set; }
         public double NetPay { get; set; }
+        public double BasicPay { get; set; }
+        public int CompanyID { get; set; }
+        public string CompanyName { get; set; }
+
     }
 }
