@@ -20,7 +20,7 @@ namespace PayrollServicesADO
                 SqlCommand sqlCommand = SqlConnection.CreateCommand();
                 sqlCommand.Transaction = sqlTransaction;
                 try
-                { 
+                {
                     sqlCommand.CommandText = "Insert into Employee(Company_Id, EmployeeName, EmployeePhoneNum, EmployeeAddress, StartDate, Gender)values(1,'abc','1234567890','ttt street','2020-05-01','M')";
                     sqlCommand.ExecuteNonQuery();
                     sqlCommand.CommandText = "Insert into PayRollCalculate (Employee_Id,BasicPay) values('5','90000')";
@@ -35,7 +35,7 @@ namespace PayrollServicesADO
                     sqlCommand.ExecuteNonQuery();
                     sqlCommand.CommandText = "Insert into EmployeeDept values('1','2')";
                     sqlCommand.ExecuteNonQuery();
-                 
+
                     sqlTransaction.Commit();
                     Console.WriteLine("Updated Successfully!");
                     flag = 1;
@@ -120,7 +120,7 @@ namespace PayrollServicesADO
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    
+
                     sqlTransaction.Rollback();
                 }
             }
@@ -200,6 +200,19 @@ inner join DepartmentTable on DepartmentTable.DepartmentId=EmployeeDept.Dept_Id"
             {
                 Console.WriteLine(ex.Message);
                 return false;
+            }
+            return false;
+        }
+        public bool ImplementingUsingThread()
+        {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+            RetrieveAllData();
+            stopWatch.Stop();
+            Console.WriteLine("Duration With thread: {0}", stopWatch.ElapsedMilliseconds);
+            if (Convert.ToInt32(stopWatch.ElapsedMilliseconds) != 0)
+            {
+                return true;
             }
             return false;
         }
