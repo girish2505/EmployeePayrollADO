@@ -48,5 +48,30 @@ namespace PayrollServicesADO
             }
             return flag;
         }
+        public int DeleteUsingCasadeDelete()
+        {
+            int result = 0;
+            using (SqlConnection)
+            {
+                SqlConnection.Open();
+                SqlTransaction sqlTransaction = SqlConnection.BeginTransaction();
+                SqlCommand sqlCommand = SqlConnection.CreateCommand();
+                sqlCommand.Transaction = sqlTransaction;
+                try
+                {
+                    sqlCommand.CommandText = "Delete from Employee where EmployeeName='Vishnu'";
+                    sqlCommand.ExecuteNonQuery();
+                    result++;
+                    sqlTransaction.Commit();
+                    Console.WriteLine("Deleted Successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    sqlTransaction.Rollback();
+                }
+            }
+            return result;
+        }
     }
 }

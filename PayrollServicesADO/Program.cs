@@ -57,6 +57,10 @@ namespace PayrollServicesADO
                     Transaction transaction = new Transaction();
                     transaction.InsertIntoTables();
                     break;
+                case 10:
+                    Transaction transaction1 = new Transaction();
+                    transaction1.DeleteUsingCasadeDelete();
+                    break;
             }
         }
     }
