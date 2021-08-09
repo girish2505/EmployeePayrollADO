@@ -67,6 +67,10 @@ namespace PayrollServicesADO
                     Transaction transaction2 = new Transaction();
                     transaction2.RetrieveAllData();
                     break;
+                case 12:
+                    Transaction transaction3 = new Transaction();
+                    transaction3.ImplementingWithoutUsingThread();
+                    break;
             }
         }
     }

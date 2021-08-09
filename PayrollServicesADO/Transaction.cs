@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Text;
 
 namespace PayrollServicesADO
@@ -178,6 +179,29 @@ inner join DepartmentTable on DepartmentTable.DepartmentId=EmployeeDept.Dept_Id"
                 }
                 sqlDataReader.Close();
             }
+        }
+        public bool ImplementingWithoutUsingThread()
+        {
+            try
+            {
+                Stopwatch stopWatch = new Stopwatch();
+                stopWatch.Start();
+                RetrieveAllData();
+
+                stopWatch.Stop();
+                Console.WriteLine("Duration without Thread excecution : {0} ", stopWatch.ElapsedMilliseconds);
+                int elapsedTime = Convert.ToInt32(stopWatch.ElapsedMilliseconds);
+                if (elapsedTime != 0)
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            return false;
         }
     }
 }
