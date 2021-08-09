@@ -59,7 +59,13 @@ namespace PayrollServicesADO
                     break;
                 case 10:
                     Transaction transaction1 = new Transaction();
-                    transaction1.DeleteUsingCasadeDelete();
+                    transaction1.AddIsActiveColumn();
+                    break;
+                case 11:
+                    Transaction trans = new Transaction();
+                    trans.MaintainListforAudit(1);
+                    Transaction transaction2 = new Transaction();
+                    transaction2.RetrieveAllData();
                     break;
             }
         }

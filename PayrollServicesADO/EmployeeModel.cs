@@ -22,6 +22,8 @@ namespace PayrollServicesADO
         public double BasicPay { get; set; }
         public int CompanyID { get; set; }
         public string CompanyName { get; set; }
+        public int IsActive { get; set; }
+
 
     }
 }

@@ -73,5 +73,111 @@ namespace PayrollServicesADO
             }
             return result;
         }
+        public string AddIsActiveColumn()
+        {
+            string result = null;
+            using (SqlConnection)
+            {
+                SqlConnection.Open();
+                SqlTransaction sqlTransaction = SqlConnection.BeginTransaction();
+                SqlCommand sqlCommand = SqlConnection.CreateCommand();
+                sqlCommand.Transaction = sqlTransaction;
+                try
+                {
+                    sqlCommand.CommandText = "Alter table Employee add IsActive int NOT NULL default 1";
+                    sqlCommand.ExecuteNonQuery();
+                    sqlTransaction.Commit();
+                    result = "IsActive Column Added";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    sqlTransaction.Rollback();
+                    result = "Column not Updated";
+                }
+            }
+            SqlConnection.Close();
+            return result;
+        }
+        public int MaintainListforAudit(int IDValue)
+        {
+            int res = 0;
+            SqlConnection.Open();
+            using (SqlConnection)
+            {
+                SqlTransaction sqlTransaction = SqlConnection.BeginTransaction();
+                SqlCommand sqlCommand = SqlConnection.CreateCommand();
+                sqlCommand.Transaction = sqlTransaction;
+                try
+                {
+                    sqlCommand.CommandText = @"Update Employee set IsActive = 0 where EmployeeID = '" + IDValue + "'";
+                    sqlCommand.ExecuteNonQuery();
+                    res++;
+                    sqlTransaction.Commit();
+                    Console.WriteLine("Updated Successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    
+                    sqlTransaction.Rollback();
+                }
+            }
+            SqlConnection.Close();
+            return res;
+        }
+        public void RetrieveAllData()
+        {
+            SqlConnection.Open();
+
+            try
+            {
+                string query = @"Select CompanyID,CompanyName,EmployeeID,EmployeeName,EmployeeAddress,IsActive,EmployeePhoneNum,StartDate,Gender,BasicPay,TaxablePay,IncomeTax,NetPay,Deductions,DepartmentId,DepartName
+from Company inner join Employee on Company.CompanyID=Employee.Company_Id and Employee.IsActive=1
+inner join PayRollCalculate on PayRollCalculate.Employee_Id=Employee.EmployeeId
+inner join EmployeeDept on EmployeeDept.Employee_Id=Employee.EmployeeID
+inner join DepartmentTable on DepartmentTable.DepartmentId=EmployeeDept.Dept_Id";
+                SqlCommand sqlCommand = new SqlCommand(query, SqlConnection);
+                DisplayEmployeeDetails(sqlCommand);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            SqlConnection.Close();
+        }
+        public void DisplayEmployeeDetails(SqlCommand sqlCommand)
+        {
+            SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+            List<EmployeeModel> employeeList = new List<EmployeeModel>();
+
+            if (sqlDataReader.HasRows)
+            {
+                while (sqlDataReader.Read())
+                {
+                    EmployeeModel model = new EmployeeModel();
+
+                    model.empId = Convert.ToInt32(sqlDataReader["EmployeeID"]);
+                    model.CompanyID = Convert.ToInt32(sqlDataReader["CompanyID"]);
+                    model.name = sqlDataReader["EmployeeName"].ToString();
+                    model.CompanyName = sqlDataReader["CompanyName"].ToString();
+                    model.BasicPay = Convert.ToDouble(sqlDataReader["BasicPay"]);
+                    model.Deductions = Convert.ToDouble(sqlDataReader["Deductions"]);
+                    model.IncomeTax = Convert.ToDouble(sqlDataReader["IncomeTax"]);
+                    model.TaxablePay = Convert.ToDouble(sqlDataReader["TaxablePay"]);
+                    model.NetPay = Convert.ToDouble(sqlDataReader["NetPay"]);
+                    model.Gender = Convert.ToString(sqlDataReader["Gender"]);
+                    model.PhoneNumber = Convert.ToInt64(sqlDataReader["EmployeePhoneNum"]);
+                    model.Department = sqlDataReader["DepartName"].ToString();
+                    model.Address = sqlDataReader["EmployeeAddress"].ToString();
+                    model.startDate = Convert.ToDateTime(sqlDataReader["StartDate"]);
+                    model.IsActive = Convert.ToInt32(sqlDataReader["IsActive"]);
+                    Console.WriteLine("\nCompany ID: {0} \t Company Name: {1} \nEmployee ID: {2} \t Employee Name: {3} \nBasic Pay: {4} \t Deduction: {5} \t Income Tax: {6} \t Taxable Pay: {7} \t NetPay: {8} \nGender: {9} \t PhoneNumber: {10} \t Department: {11} \t Address: {12} \t Start Date: {13} \t IsActive: {14}", model.CompanyID, model.CompanyName, model.empId, model.name, model.BasicPay, model.Deductions, model.IncomeTax, model.TaxablePay, model.NetPay, model.Gender, model.PhoneNumber, model.Department, model.Address, model.startDate, model.IsActive);
+                    employeeList.Add(model);
+                }
+                sqlDataReader.Close();
+            }
+        }
     }
 }
